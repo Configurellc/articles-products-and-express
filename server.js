@@ -7,7 +7,6 @@ let app = express();
   app.use(bodyparser.urlencoded({extended: true}));
   app.use(bodyparser.json());
 let router = express.Router();
-
 const hbs = handlebars.create({
   extname: '.hbs',
   default: 'app'
@@ -26,21 +25,20 @@ const hbs = handlebars.create({
   let productStore = products.getAllProducts();
     let store = {
       'productData': productStore
+    };
+      console.log('my store', productStore);
 
+    res.render('products', store);
+  });
 
-    }
-    console.log('my store', productStore);
-
-    res.render('products', store)
+  app.get('/products/:id', (req, res) => {
+    console.log('By ID', products.getProductById(req.params.id))
+    res.render('product')
   })
 
-  let counter = {id: 0};
     app.post('/products', (req, res) => {
-     let resValue = req.body;
-      // console.log(resValue);
-      counter.id++;
-      // console.log('number:', counter);
-      products.createProduct(resValue)
+     let reqValue = req.body;
+      products.createProduct(reqValue);
     res.end();
     })
 
