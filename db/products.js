@@ -1,54 +1,76 @@
+const pgp = require('pg-promise')();
+const db = pgp({
+  host: 'localhost',
+  port: 5432,
+  database: 'articles_products',
+  user: 'postgres',
+  password: 'postgres'
+});
 
-
- let products = [];
+let products = [];
 let counter = 0;
-function createProduct (reqValue) {
 
-  if( reqValue !== undefined){
+  function createProduct (req, res) {
+    let reqValue = req.body;
 
-   reqValue.id = counter;
-   products.push(reqValue);
+    if( reqValue !== undefined){
 
-   counter++;
+      db.many(`INSERT INTO products(
+        name,
+        price,
+        inventory
+        )
+        VALUES(
+        '${reqValue.name}',
+        ${reqValue.price},
+        ${reqValue.inventory})`)
 
-  }else{
-    console.log('no value added');
+        .catch( err => {
+          console.error(err);
+      });
+
+    }else{
+      console.log('no value added');
+    }
+  };
+
+  function getAllProducts() {
+    return db.many( 'SELECT * FROM products');
   }
-  console.log(products);
-  return products
-};
 
-function getAllProducts() {
+  function getProductById(reqId) {
+    //get the element by its id
 
- return products;
-}
+      let reqValue = reqId.body;
 
-function getProductById(reqId) {
-  //get the element by its id
+    // console.log('req Id', reqValue);
+    // console.log('prod Id', reqId.params.id);
+    // console.log('Id', reqValue.id);
+  return db.one( `SELECT * FROM products WHERE id = ${reqId.params.id}`);
 
-  for( var i = 0; i < products.length; i++) {
-    // if( products[i].id === reqId.id) {
-    //   return products[i].id;
-    // }else {
-    //   return 'item not found';
+    // for( var i = 0; i < products.length; i++ ) {
+    //    if( products[i].id === products[i].id) {
+    //      return reqId;
+    //    }else {
+    //      return 'item not found';
+    //   }
+    //   console.log(products[i].id)
+
     // }
-    console.log(products[i].id)
 
+
+    //modify the contexts of the id to new context
+
+  };
+
+  function updateProductById(id) {
+    // body...
   }
 
 
-  //modify the contexts of the id to new context
-
-};
-
-function updateProductById(id) {
-  // body...
-}
-
-
-function deleteProductById(id) {
-  // body...
-}
+  function deleteProductById(id) {
+    // body...
+  }
 
 module.exports = {
   createProduct: createProduct,
