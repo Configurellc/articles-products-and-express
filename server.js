@@ -3,6 +3,8 @@ const PORT = process.env.PORT || 3000;
 const handlebars = require('express-handlebars');
 const products = require('./db/products.js')
 let bodyparser = require('body-parser')
+
+
 let app = express();
   app.use(bodyparser.urlencoded({extended: true}));
   app.use(bodyparser.json());
@@ -21,25 +23,34 @@ const hbs = handlebars.create({
   });
 
   app.get('/products', (req, res) => {
+   products.getAllProducts()
+    .then( results => {
+      let store = {
+        'productData': results
+      };
+      res.render('products', store);
+    });
 
-  let productStore = products.getAllProducts();
-    let store = {
-      'productData': productStore
-    };
-      console.log('my store', productStore);
-
-    res.render('products', store);
   });
 
   app.get('/products/:id', (req, res) => {
-    console.log('By ID', products.getProductById(req.params.id))
-    res.render('product')
-  })
+    products.getProductById(req)
+      .then( results => {
+         let store = {
+        'productData': results
+      };
+        console.log('By results', results);
+       res.render('./partials/product', results);
+      })
+      .catch( error => {
+        console.error('err');
+      })
+
+  });
 
     app.post('/products', (req, res) => {
-     let reqValue = req.body;
-      products.createProduct(reqValue);
-    res.end();
+      products.createProduct(req, res);
+       res.end();
     })
 
   app.listen(PORT, () => {
